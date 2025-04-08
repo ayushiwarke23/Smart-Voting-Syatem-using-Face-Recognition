@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verified</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .float-hover:hover { animation: float 2s ease-in-out infinite; }
+    .glow-hover:hover { box-shadow: 0 0 15px rgba(168, 85, 247, 0.6); }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4); }
+    .input-focus:focus { box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.4); }
+    body { padding-top: 72px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+    main { min-height: calc(100vh - 72px); position: relative; z-index: 10; }
+    .gradient-bg { background: linear-gradient(135deg, #111827 0%, #6b21a8 50%, #111827 100%); }
+    .confetti { position: absolute; width: 10px; height: 10px; background-color: #a855f7; opacity: 0.7; animation: fall 5s linear infinite; }
+    @keyframes fall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(100vh) rotate(360deg); } }
+  </style>
+</head>
+<body class="gradient-bg text-white font-sans min-h-screen flex flex-col overflow-hidden">
+  <div id="confetti-container" class="fixed inset-0 pointer-events-none z-0"></div>
+  <header class="bg-gray-900/95 backdrop-blur-md shadow-2xl sticky top-0 z-[100] border-b border-purple-900/50 h-[72px]">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+      <a href="{{ url_for('register') }}" class="flex items-center gap-3 group">
+        <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Logo" class="w-9 h-9 transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(168,85,247,0.7)]">
+        <h1 class="text-purple-400 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-300 group-hover:bg-gradient-to-r group-hover:from-pink-300 group-hover:to-purple-400 transition-all duration-500">eVote</h1>
+      </a>
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="{{ url_for('register') }}" class="nav-link relative px-4 py-2 text-purple-200 group transition-all duration-300 hover:text-white">
+          <span class="relative z-10 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg> Register
+          </span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-500 ease-out"></span>
+          <span class="absolute inset-0 bg-purple-900/20 rounded-lg scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300"></span>
+        </a>
+        <a href="{{ url_for('vote') }}" class="nav-link relative px-4 py-2 text-purple-200 group transition-all duration-300 hover:text-white">
+          <span class="relative z-10 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+            </svg> Vote
+          </span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-pink-500 group-hover:w-full transition-all duration-500 ease-out"></span>
+          <span class="absolute inset-0 bg-pink-900/20 rounded-lg scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300"></span>
+        </a>
+      </nav>
+      <button id="mobile-menu-button" class="md:hidden text-purple-300 hover:text-white transition-colors p-2 rounded-lg hover:bg-purple-900/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden hidden bg-gray-900/95 backdrop-blur-lg border-t border-purple-900/30">
+      <div class="px-6 py-4 space-y-3">
+        <a href="{{ url_for('register') }}" class="mobile-nav-link block px-4 py-3 text-purple-200 rounded-lg hover:bg-purple-900/30 hover:text-white transition-all duration-300 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+          </svg> Register
+        </a>
+        <a href="{{ url_for('vote') }}" class="mobile-nav-link block px-4 py-3 text-purple-200 rounded-lg hover:bg-purple-900/30 hover:text-white transition-all duration-300 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+          </svg> Vote
+        </a>
+      </div>
+    </div>
+  </header>
+  <main class="max-w-md mx-auto my-12 bg-gray-900/80 p-10 rounded-2xl shadow-2xl backdrop-blur-sm border border-purple-900/20 flex-grow flex flex-col items-center transition-all duration-300 card-hover z-10">
+    <h2 class="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 mb-4">Identity Verified!</h2>
+    <p class="text-center text-lg text-purple-200 mb-8">Your identity has been successfully verified through Aadhar and facial recognition.</p>
+    <div class="relative mb-8">
+      <img src="https://cdn-icons-png.flaticon.com/512/633/633759.png" alt="Thumbs Up" class="w-24 h-24 transform hover:scale-110 transition-transform duration-300">
+      <div class="absolute -inset-2 rounded-full bg-purple-500/20 blur-md z-0"></div>
+    </div>
+    <a href="{{ url_for('cast_vote', aadhar=aadhar) }}" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-8 rounded-xl text-base font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] glow-hover">Go to Voting Page</a>
+  </main>
+  <footer class="py-6 text-center text-gray-400 text-sm bg-black/80 backdrop-blur-sm border-t border-purple-900/30 w-full z-10">
+    <div class="max-w-6xl mx-auto px-4">
+      &copy; 2025 eVote System. All rights reserved.
+      <div class="mt-2 flex justify-center space-x-4">
+        <a href="#" class="text-purple-400 hover:text-pink-300 transition">Privacy Policy</a>
+        <a href="#" class="text-purple-400 hover:text-pink-300 transition">Terms of Service</a>
+        <a href="#" class="text-purple-400 hover:text-pink-300 transition">Contact Us</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('confetti-container');
+      const colors = ['#a855f7', '#ec4899', '#6366f1', '#8b5cf6', '#d946ef'];
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.animationDuration = `${5 + Math.random() * 5}s`;
+        confetti.style.animationDelay = `${Math.random() * 5}s`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = `${5 + Math.random() * 10}px`;
+        confetti.style.height = `${5 + Math.random() * 10}px`;
+        container.appendChild(confetti);
+      }
+    });
+  </script>
+</body>
+</html>
